@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">mWater</string>
+    <string name="lblCapturar">Capture</string>
+    <string name="lblCancelar">Cancel</string>
+</resources>
