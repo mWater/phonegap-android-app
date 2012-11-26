@@ -5,6 +5,7 @@ import org.apache.cordova.api.CordovaInterface;
 import org.apache.cordova.api.IPlugin;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,7 +33,7 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 	@Override
 	protected void onRestart() {
 		Log.d(TAG, "onRestart");
-		super.onRestart(); 
+		super.onRestart();
 	}
 
 	@Override
@@ -55,16 +56,20 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 
 	private boolean keepRunning;
 
+	ProgressDialog progressDialog;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.d(TAG, "onCreate");
 
-		setContentView(R.layout.activity_main); 
+		setContentView(R.layout.activity_main);
 		CordovaWebView cwv = (CordovaWebView) findViewById(R.id.tutorialView);
 		SpecialChromeClient client = new SpecialChromeClient(this, cwv);
 		cwv.setWebChromeClient(client);
 		cwv.loadUrl("file:///android_asset/www/index.html?cordova=true");
+
+		progressDialog = ProgressDialog.show(this, "", "Loading Application");
 	}
 
 	public void reloadMenu(ActionBarPlugin actionBarPlugin) {
@@ -106,16 +111,21 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 	}
 
 	/**
-     * Called when a message is sent to plugin.
-     *
-     * @param id            The message id
-     * @param data          The message data
-     * @return              Object or null
-     */
-    public Object onMessage(String id, Object data) {
-        Log.d(TAG, "onMessage(" + id + "," + data + ")");
-        return null;
-    }
+	 * Called when a message is sent to plugin.
+	 * 
+	 * @param id
+	 *            The message id
+	 * @param data
+	 *            The message data
+	 * @return Object or null
+	 */
+	public Object onMessage(String id, Object data) {
+		if (id == "spinner")
+			progressDialog.dismiss();
+
+		Log.d(TAG, "onMessage(" + id + "," + data + ")");
+		return null;
+	}
 
 	public void setActivityResultCallback(IPlugin plugin) {
 		this.activityResultCallback = plugin;
@@ -139,30 +149,35 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 		}
 	}
 
-    @Override
+	@Override
 	protected void onDestroy() {
-    	Log.d(TAG, "onDestroy");
+		Log.d(TAG, "onDestroy");
 		super.onDestroy();
 	}
 
 	/**
-     * Launch an activity for which you would like a result when it finished. When this activity exits,
-     * your onActivityResult() method will be called.
-     *
-     * @param command           The command object
-     * @param intent            The intent to start
-     * @param requestCode       The request code that is passed to callback to identify the activity
-     */
-    public void startActivityForResult(IPlugin command, Intent intent, int requestCode) {
-        this.activityResultCallback = command;
-        this.activityResultKeepRunning = this.keepRunning;
+	 * Launch an activity for which you would like a result when it finished.
+	 * When this activity exits, your onActivityResult() method will be called.
+	 * 
+	 * @param command
+	 *            The command object
+	 * @param intent
+	 *            The intent to start
+	 * @param requestCode
+	 *            The request code that is passed to callback to identify the
+	 *            activity
+	 */
+	public void startActivityForResult(IPlugin command, Intent intent, int requestCode) {
+		this.activityResultCallback = command;
+		this.activityResultKeepRunning = this.keepRunning;
 
-        // If multitasking turned on, then disable it for activities that return results
-        if (command != null) {
-            this.keepRunning = false;
-        }
+		// If multitasking turned on, then disable it for activities that return
+		// results
+		if (command != null) {
+			this.keepRunning = false;
+		}
 
-        // Start activity
-        super.startActivityForResult(intent, requestCode);
-    }
+		// Start activity
+		super.startActivityForResult(intent, requestCode);
+	}
 }
