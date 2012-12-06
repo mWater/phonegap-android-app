@@ -54,6 +54,7 @@
     <plugin name="Echo" value="org.apache.cordova.Echo" />
     <plugin name="WebIntent" value="com.borismus.webintent.WebIntent"/>
     <plugin name="ActionBar" value="co.mwater.htmlapp.ActionBarPlugin"/>
+    <plugin name="BluetoothPlugin" value="org.apache.cordova.plugin.BluetoothPlugin"/>
 </plugins>
 </cordova>
 
