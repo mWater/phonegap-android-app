@@ -13,7 +13,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Environment;
+import android.util.Log;
 
 public class AppUpdater {
 	private static final String TAG = AppUpdater.class.getCanonicalName();
@@ -32,8 +36,33 @@ public class AppUpdater {
 		return buildExternalPath(context, APP_FOLDER) + File.separator + version;
 	}
 	
-	public static void downloadUpdates() {
+	public static void downloadUpdates(Context context) {
+		// Send image to be processed
+		Intent intent = new Intent(context,
+				UpdateIntentService.class);
+		PackageInfo pInfo;
+		try {
+			pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+		} catch (NameNotFoundException e) {
+			Log.e(TAG, e.getLocalizedMessage());
+			return;
+		}
 		
+		int androidVersion = pInfo.versionCode;
+		int appVersion;
+		try {
+			appVersion = getLatestInstalledVersion(context);
+		} catch (IOException e) {
+			Log.e(TAG, e.getLocalizedMessage());
+			return;
+		}
+		String url = 
+				"http://data.mwater.co/update_app?app=mwater&platform=android&platform_version=" + androidVersion 
+				+ "&app_version=" + appVersion;
+		intent.putExtra("url", url);
+
+		Log.d(TAG, "Calling update intent service");
+		context.startService(intent);
 	}
 	
 	/**
@@ -80,6 +109,7 @@ public class AppUpdater {
 
 		// Unpack zip
 		try {
+			Log.d(TAG, "Unzipping app update");
 			unpackZip(zipStream, tempDir);
 
 			// Get first inner folder
@@ -103,6 +133,8 @@ public class AppUpdater {
 			// Move directory
 			File src = new File(zipDir + File.separator + files[0]);
 			src.renameTo(dest);
+			
+			Log.i(TAG, "Updated app to version " + files[0]);
 		} catch (IOException ex) {
 			// Remove temp dir
 			deleteRecursive(new File(tempDir));

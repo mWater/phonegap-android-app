@@ -88,7 +88,7 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 		new StartAppTask().execute(getApplicationContext());
 
 		// Launch thread to download updates
-		AppUpdater.downloadUpdates();
+		AppUpdater.downloadUpdates(getApplicationContext());
 
 		progressDialog = ProgressDialog.show(this, "", "Loading mWater...");
 	}
