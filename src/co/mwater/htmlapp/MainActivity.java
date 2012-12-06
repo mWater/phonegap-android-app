@@ -1,15 +1,23 @@
 package co.mwater.htmlapp;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.api.CordovaInterface;
 import org.apache.cordova.api.IPlugin;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -57,6 +65,7 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 	private boolean keepRunning;
 
 	ProgressDialog progressDialog;
+	CordovaWebView cwv;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -64,12 +73,78 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 		Log.d(TAG, "onCreate");
 
 		setContentView(R.layout.activity_main);
-		CordovaWebView cwv = (CordovaWebView) findViewById(R.id.tutorialView);
+		cwv = (CordovaWebView) findViewById(R.id.mainView);
 		SpecialChromeClient client = new SpecialChromeClient(this, cwv);
 		cwv.setWebChromeClient(client);
-		cwv.loadUrl("file:///android_asset/www/index.html?cordova=true");
 
-		progressDialog = ProgressDialog.show(this, "", "Loading Application");
+		// TODO Clear cache
+		// cwv.clearCache(true);
+
+		// TODO Display splash screen
+		View rootView = findViewById(android.R.id.content);
+		rootView.setBackgroundResource(R.drawable.mwater); // ###
+
+		// Launch thread to start app
+		new StartAppTask().execute(getApplicationContext());
+
+		// Launch thread to download updates
+		AppUpdater.downloadUpdates();
+
+		progressDialog = ProgressDialog.show(this, "", "Loading mWater...");
+	}
+
+	private class StartAppTask extends AsyncTask<Context, Void, String> {
+		volatile IOException ex;
+
+		@Override
+		protected void onPostExecute(String url) {
+			if (url == null) {
+				final IOException fex = ex;
+				AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+				alertDialog.setTitle("Error loading application");
+				alertDialog.setMessage(ex.getLocalizedMessage());
+				alertDialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						MainActivity.this.finish();
+						throw new RuntimeException(fex);
+					}
+				});
+				alertDialog.show();
+			}
+			Log.d(TAG, "Launching url " + url);
+			cwv.loadUrl(url);
+		}
+
+		@Override
+		protected String doInBackground(Context[] contexts) {
+			Context ctx = contexts[0];
+
+			// Launch thread to start app
+			try {
+				int appVersion = AppUpdater.getLatestInstalledVersion(ctx);
+				Log.d(TAG, "Found app version " + appVersion);
+				if (appVersion == 0) {
+					// Unzip base html app version if doesn't exist
+					AppUpdater.installAppUpdate(ctx, ctx.getAssets().open("app.zip"));
+					appVersion = AppUpdater.getLatestInstalledVersion(ctx);
+					if (appVersion == 0)
+						throw new IOException("Failed to install base app");
+					Log.d(TAG, "Installed base version " + appVersion);
+				}
+				String installedPath = AppUpdater.getInstalledPath(ctx, appVersion);
+				
+				// Setup actionbar plugin
+				ActionBarPlugin.baseIconPath = installedPath;
+				
+				String url = new File(installedPath).toURI().toURL().toExternalForm();
+				url += "index.html?cordova=true";
+				return url;
+			} catch (IOException ex) {
+				this.ex = ex;
+				return null;
+			}
+		}
+
 	}
 
 	public void reloadMenu(ActionBarPlugin actionBarPlugin) {

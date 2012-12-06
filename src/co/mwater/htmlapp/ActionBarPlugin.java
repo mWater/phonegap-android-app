@@ -1,5 +1,6 @@
 package co.mwater.htmlapp;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.cordova.api.Plugin;
@@ -23,6 +24,9 @@ public class ActionBarPlugin extends Plugin {
 	private static String TAG = ActionBarPlugin.class.getSimpleName();
 	private String menuCallback = null;
 	JSONArray menuArgs;
+	
+	// Set this to the path under which icons will be found. No termination slash
+	static public String baseIconPath;
 
 	/**
 	 * Executes the request and returns PluginResult.
@@ -114,9 +118,7 @@ public class ActionBarPlugin extends Plugin {
 					}
 				});
 				if (item.has("icon")) {
-					Drawable d = Drawable.createFromStream(
-							this.cordova.getActivity().getAssets().
-									open("www/" + item.getString("icon")), null);
+					Drawable d = Drawable.createFromPath(baseIconPath + File.separator  + item.getString("icon"));
 					menuItem.setIcon(d);
 				}
 				if (item.has("enabled")) {
@@ -129,10 +131,7 @@ public class ActionBarPlugin extends Plugin {
 		} catch (JSONException e) {
 			e.printStackTrace();
 			throw new IllegalArgumentException("Invalid menu", e);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new IllegalArgumentException("Invalid icon", e);
-		}
+		} 
 	}
 
 	public void homeClicked() {
