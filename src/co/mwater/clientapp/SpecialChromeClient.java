@@ -1,4 +1,4 @@
-package co.mwater.htmlapp;
+package co.mwater.clientapp;
 
 import org.apache.cordova.CordovaChromeClient;
 import org.apache.cordova.CordovaWebView;

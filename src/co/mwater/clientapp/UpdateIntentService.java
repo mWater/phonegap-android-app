@@ -1,4 +1,4 @@
-package co.mwater.htmlapp;
+package co.mwater.clientapp;
 
 import java.io.File;
 import java.io.FileOutputStream;

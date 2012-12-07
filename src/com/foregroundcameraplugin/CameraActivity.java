@@ -21,7 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import co.mwater.htmlapp.R;
+import co.mwater.clientapp.R;
 
 import android.app.Activity;
 import android.hardware.Camera;
