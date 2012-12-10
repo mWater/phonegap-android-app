@@ -2,4 +2,6 @@
 /bin
 .hg
 .hgignore
+releases
 gen
+/*.keystore
