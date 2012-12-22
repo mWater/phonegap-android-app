@@ -25,11 +25,14 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class MainActivity extends SherlockActivity implements CordovaInterface, ActionBarPluginActivity {
 	private static String TAG = MainActivity.class.getSimpleName();
+	String initialHash;
 
 	@Override
 	protected void onPause() {
 		Log.d(TAG, "onPause");
 		super.onPause();
+		
+		// Save state
 	}
 
 	@Override
@@ -42,6 +45,18 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 	protected void onRestart() {
 		Log.d(TAG, "onRestart");
 		super.onRestart();
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		Log.d(TAG, "onSaveInstanceState");
+		super.onSaveInstanceState(outState);
+		
+		String url = cwv.getUrl();
+		if (url.contains("#")) {
+			String hash = url.substring(url.indexOf('#'));
+			outState.putString("hash", hash);
+		}
 	}
 
 	@Override
@@ -72,6 +87,10 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 		super.onCreate(savedInstanceState);
 		Log.d(TAG, "onCreate");
 
+		if (savedInstanceState != null) {
+			initialHash = savedInstanceState.getString("hash");
+		}
+
 		setContentView(R.layout.activity_main);
 		cwv = (CordovaWebView) findViewById(R.id.mainView);
 		SpecialChromeClient client = new SpecialChromeClient(this, cwv);
@@ -86,9 +105,6 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 
 		// Launch thread to start app
 		new StartAppTask().execute(getApplicationContext());
-
-		// Launch thread to download updates
-		AppUpdater.downloadUpdates(getApplicationContext());
 
 		progressDialog = ProgressDialog.show(this, "", "Loading mWater...");
 	}
@@ -113,6 +129,9 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 			}
 			Log.d(TAG, "Launching url " + url);
 			cwv.loadUrl(url);
+			
+			// Launch thread to download updates
+			AppUpdater.downloadUpdates(getApplicationContext());
 		}
 
 		@Override
@@ -133,11 +152,19 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 				}
 				String installedPath = AppUpdater.getInstalledPath(ctx, appVersion);
 				
+				// Delete old version
+				int oldAppVersion = AppUpdater.getEarliestInstalledVersion(ctx);
+				if (oldAppVersion > 0 && oldAppVersion < appVersion)
+					AppUpdater.deleteInstalledVersion(ctx, oldAppVersion);
+				
 				// Setup actionbar plugin
 				ActionBarPlugin.baseIconPath = installedPath;
 				
 				String url = new File(installedPath).toURI().toURL().toExternalForm();
 				url += "index.html?cordova=true";
+				
+				if (initialHash != null)
+					url += "#" + initialHash;
 				return url;
 			} catch (IOException ex) {
 				this.ex = ex;

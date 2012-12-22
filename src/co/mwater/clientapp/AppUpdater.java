@@ -95,6 +95,51 @@ public class AppUpdater {
 	}
 
 	/**
+	 * Gets the latest installed version of the app
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	public static void deleteInstalledVersion(Context context, int version) throws IOException {
+		// Delete folder
+		File dir = new File(buildExternalPath(context, APP_FOLDER + File.separator + version));
+		if (!dir.exists())
+			return;
+		
+		deleteRecursive(dir);
+	}
+
+	/**
+	 * Gets the earliest installed version of the app
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	public static int getEarliestInstalledVersion(Context context) throws IOException {
+		File dir = new File(buildExternalPath(context, APP_FOLDER));
+		if (!dir.exists())
+			return 0;
+
+		String[] files = dir.list();
+		if (files == null)
+			return 0;
+
+		// Get minimum version number
+		int minver = 0;
+		for (String filename : dir.list()) {
+			try {
+				int ver = Integer.parseInt(filename);
+				if (ver < minver || minver == 0)
+					minver = ver;
+			} catch (NumberFormatException ex) {
+			}
+		}
+
+		return minver;
+	}
+
+	
+	/**
 	 * Installs an app update which consists of a zip with one single folder
 	 * for version number. e.g. 12/...files
 	 * 
