@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -142,9 +143,27 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 			try {
 				int appVersion = AppUpdater.getLatestInstalledVersion(ctx);
 				Log.d(TAG, "Found app version " + appVersion);
-				if (appVersion == 0) {
-					// Unzip base html app version if doesn't exist
-					AppUpdater.installAppUpdate(ctx, ctx.getAssets().open("app.zip"));
+				
+				// Get base version
+				String[] assets = ctx.getAssets().list("");
+				int baseVersion = 0;
+				for (String asset : assets) {
+					if (asset.endsWith(".zip")) {
+						try {
+							baseVersion = Integer.parseInt(asset.substring(0, asset.length() - 4));
+						} catch (NumberFormatException nbex) {
+							// Do nothing
+						}
+					}
+				}
+				
+				if (baseVersion == 0) {
+					throw new IOException("Base version missing");
+				}
+				
+				if (appVersion < baseVersion) {
+					// Unzip base html app version 
+					AppUpdater.installAppUpdate(ctx, ctx.getAssets().open(baseVersion + ".zip"));
 					appVersion = AppUpdater.getLatestInstalledVersion(ctx);
 					if (appVersion == 0)
 						throw new IOException("Failed to install base app");

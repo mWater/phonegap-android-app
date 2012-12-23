@@ -36,7 +36,6 @@ public class UpdateIntentService extends IntentService {
 			input = connection.getInputStream();
 
 			// Install update
-			Log.d(TAG, "Installing update from " + url);
 			AppUpdater.installAppUpdate(getApplicationContext(), input);
 		} catch (IOException e) {
 			Log.w(TAG, "Failed to download update: " + e.getLocalizedMessage());

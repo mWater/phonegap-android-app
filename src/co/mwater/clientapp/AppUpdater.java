@@ -154,8 +154,10 @@ public class AppUpdater {
 
 		// Unpack zip
 		try {
-			Log.d(TAG, "Unzipping app update");
+			Log.d(TAG, "Trying to unzip app update");
 			unpackZip(zipStream, tempDir);
+
+			Log.d(TAG, "Unzipped update");
 
 			// Get first inner folder
 			File zipDir = new File(tempDir);
@@ -181,8 +183,13 @@ public class AppUpdater {
 			
 			Log.i(TAG, "Updated app to version " + files[0]);
 		} catch (IOException ex) {
-			// Remove temp dir
-			deleteRecursive(new File(tempDir));
+			try {
+				// Remove temp dir
+				deleteRecursive(new File(tempDir));
+			}
+			catch (IOException e) {
+				// Discard
+			}
 		}
 	}
 
