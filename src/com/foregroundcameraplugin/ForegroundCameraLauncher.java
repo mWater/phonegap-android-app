@@ -23,7 +23,9 @@ import java.io.OutputStream;
 
 import org.apache.cordova.CameraLauncher;
 import org.apache.cordova.ExifHelper;
+import org.apache.cordova.api.CallbackContext;
 import org.apache.cordova.api.CordovaInterface;
+import org.apache.cordova.api.CordovaPlugin;
 import org.apache.cordova.api.LOG;
 import org.apache.cordova.api.Plugin;
 import org.apache.cordova.api.PluginResult;
@@ -58,7 +60,6 @@ public class ForegroundCameraLauncher extends CameraLauncher {
 	private Uri imageUri;
 	private File photo;
 
-	public String callbackId;
 	private int numPics;
 
 	private static final String _DATA = "_data";
@@ -80,10 +81,11 @@ public class ForegroundCameraLauncher extends CameraLauncher {
 	 *            The callback id used when calling back into JavaScript.
 	 * @return A PluginResult object with a status and message.
 	 */
-	public PluginResult execute(String action, JSONArray args, String callbackId) {
+	@Override
+	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 		PluginResult.Status status = PluginResult.Status.OK;
 		String result = "";
-		this.callbackId = callbackId;
+		this.callbackContext = callbackContext;
 
 		try {
 			if (action.equals("takePicture")) {
@@ -102,12 +104,14 @@ public class ForegroundCameraLauncher extends CameraLauncher {
 
 				PluginResult r = new PluginResult(PluginResult.Status.NO_RESULT);
 				r.setKeepCallback(true);
-				return r;
+				callbackContext.sendPluginResult(r);
+				return true;
 			}
-			return new PluginResult(status, result);
+			return false;
 		} catch (JSONException e) {
 			e.printStackTrace();
-			return new PluginResult(PluginResult.Status.JSON_EXCEPTION);
+			callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION));
+			return true;
 		}
 	}
 
@@ -136,7 +140,7 @@ public class ForegroundCameraLauncher extends CameraLauncher {
 		this.imageUri = Uri.fromFile(photo);
 		intent.putExtra(MediaStore.EXTRA_OUTPUT, this.imageUri);
 
-		this.cordova.startActivityForResult((Plugin) this, intent, 1);
+		this.cordova.startActivityForResult((CordovaPlugin) this, intent, 1);
 	}
 
 	/**
@@ -222,12 +226,12 @@ public class ForegroundCameraLauncher extends CameraLauncher {
 				os.close();
 
 				// Restore exif data to file
-				exif.createOutFile(getRealPathFromURI(uri, this.ctx));
+				exif.createOutFile(getRealPathFromURI(uri, this.cordova));
 				exif.writeExifData();
 
 				// Send Uri back to JavaScript for viewing image
-				this.success(new PluginResult(PluginResult.Status.OK,
-						getRealPathFromURI(uri, this.ctx)), this.callbackId);
+				this.callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK,
+						getRealPathFromURI(uri, this.cordova)));
 
 				bitmap.recycle();
 				bitmap = null;

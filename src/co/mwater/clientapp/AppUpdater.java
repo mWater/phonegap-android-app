@@ -163,7 +163,7 @@ public class AppUpdater {
 			File zipDir = new File(tempDir);
 			String[] files = zipDir.list();
 			if (files == null)
-				throw new IOException("Unzip is not directory");
+				throw new IOException("Update is empty");
 			if (files.length != 1)
 				throw new IOException("Incorrect contents of zip update");
 
@@ -183,6 +183,7 @@ public class AppUpdater {
 			
 			Log.i(TAG, "Updated app to version " + files[0]);
 		} catch (IOException ex) {
+			Log.d(TAG, "Unable to unzip update: " + ex.getLocalizedMessage()); 
 			try {
 				// Remove temp dir
 				deleteRecursive(new File(tempDir));

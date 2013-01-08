@@ -2,10 +2,12 @@ package co.mwater.clientapp;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.api.CordovaInterface;
-import org.apache.cordova.api.IPlugin;
+import org.apache.cordova.api.CordovaPlugin;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -14,6 +16,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +30,7 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class MainActivity extends SherlockActivity implements CordovaInterface, ActionBarPluginActivity {
 	private static String TAG = MainActivity.class.getSimpleName();
+	private final ExecutorService threadPool = Executors.newCachedThreadPool();
 	String initialHash;
 
 	@Override
@@ -54,7 +59,7 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 		super.onSaveInstanceState(outState);
 		
 		String url = cwv.getUrl();
-		if (url.contains("#")) {
+		if (url != null && url.contains("#")) {
 			String hash = url.substring(url.indexOf('#'));
 			outState.putString("hash", hash);
 		}
@@ -74,7 +79,7 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 
 	ActionBarPlugin actionBarPlugin;
 
-	private IPlugin activityResultCallback;
+	private CordovaPlugin activityResultCallback;
 
 	private Object activityResultKeepRunning;
 
@@ -180,12 +185,17 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 				ActionBarPlugin.baseIconPath = installedPath;
 				
 				String url = new File(installedPath).toURI().toURL().toExternalForm();
-				url += "index.html?cordova=true";
+				
+				PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+				url += "index.html?cordova=true&app_version=" + pInfo.versionCode;
 				
 				if (initialHash != null)
 					url += "#" + initialHash;
 				return url;
 			} catch (IOException ex) {
+				this.ex = ex;
+				return null;
+			} catch (NameNotFoundException e) {
 				this.ex = ex;
 				return null;
 			}
@@ -248,7 +258,7 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 		return null;
 	}
 
-	public void setActivityResultCallback(IPlugin plugin) {
+	public void setActivityResultCallback(CordovaPlugin plugin) {
 		this.activityResultCallback = plugin;
 	}
 
@@ -264,7 +274,7 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 	 */
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-		IPlugin callback = this.activityResultCallback;
+		CordovaPlugin callback = this.activityResultCallback;
 		if (callback != null) {
 			callback.onActivityResult(requestCode, resultCode, intent);
 		}
@@ -288,7 +298,7 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 	 *            The request code that is passed to callback to identify the
 	 *            activity
 	 */
-	public void startActivityForResult(IPlugin command, Intent intent, int requestCode) {
+	public void startActivityForResult(CordovaPlugin command, Intent intent, int requestCode) {
 		this.activityResultCallback = command;
 		this.activityResultKeepRunning = this.keepRunning;
 
@@ -300,5 +310,9 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 
 		// Start activity
 		super.startActivityForResult(intent, requestCode);
+	}
+
+	public ExecutorService getThreadPool() {
+	    return threadPool;
 	}
 }
