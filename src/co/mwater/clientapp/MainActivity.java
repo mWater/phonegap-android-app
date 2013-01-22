@@ -2,6 +2,8 @@ package co.mwater.clientapp;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -60,7 +62,7 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 		
 		String url = cwv.getUrl();
 		if (url != null && url.contains("#")) {
-			String hash = url.substring(url.indexOf('#'));
+			String hash = url.substring(url.indexOf('#') + 1);
 			outState.putString("hash", hash);
 		}
 	}
@@ -106,8 +108,8 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 		// cwv.clearCache(true);
 
 		// TODO Display splash screen
-		View rootView = findViewById(android.R.id.content);
-		rootView.setBackgroundResource(R.drawable.mwater); // ###
+		//View rootView = findViewById(android.R.id.content);
+		//rootView.setBackgroundResource(R.drawable.mwater); // ###
 
 		// Launch thread to start app
 		new StartAppTask().execute(getApplicationContext());
