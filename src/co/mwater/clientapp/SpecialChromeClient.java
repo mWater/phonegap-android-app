@@ -7,6 +7,7 @@ import org.apache.cordova.api.CordovaInterface;
 import android.util.Log;
 import android.webkit.ConsoleMessage;
 import android.webkit.ConsoleMessage.MessageLevel;
+import android.webkit.GeolocationPermissions;
 
 public class SpecialChromeClient extends CordovaChromeClient {
     private String TAG = "CordovaLog2";
@@ -22,7 +23,6 @@ public class SpecialChromeClient extends CordovaChromeClient {
 	static String cleanParam(String p) {
 		return p.replace("\"", "\\\"").replace("\n","\\n").replace("\r","\\r");
 	}
-	
 	
 	@Override
 	public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
@@ -41,4 +41,12 @@ public class SpecialChromeClient extends CordovaChromeClient {
 		
 		return super.onConsoleMessage(consoleMessage);
 	}
+
+	/**
+	 * Always allow Geolocation
+	 */
+	@Override
+	public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+        callback.invoke(origin, true, false);
+    }
 }
