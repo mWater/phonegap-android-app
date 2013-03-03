@@ -1,4 +1,6 @@
 
+Requires Actionbar Sherlock <=4.1.0 as Eclipse project. 4.2.0 removes forced overflow.
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
