@@ -22,15 +22,16 @@
     access elements control the Android whitelist.
     Domains are assumed blocked unless set otherwise
      -->
-
     <access origin="http://127.0.0.1*"/> <!-- allow local pages -->
 
     <!-- <access origin="https://example.com" /> allow any secure requests to example.com -->
     <!-- <access origin="https://example.com" subdomains="true" /> such as above, but including subdomains, such as www -->
     <access origin=".*"/>
 
+    <content src="index.html" />
     <log level="DEBUG"/>
     <preference name="exit-on-suspend" value="false" />
+    
 <plugins>
     <plugin name="App" value="org.apache.cordova.App"/>
     <plugin name="Geolocation" value="org.apache.cordova.GeoBroker"/>
@@ -38,19 +39,21 @@
     <plugin name="Accelerometer" value="org.apache.cordova.AccelListener"/>
     <plugin name="Compass" value="org.apache.cordova.CompassListener"/>
     <plugin name="Media" value="org.apache.cordova.AudioHandler"/>
-    <!--<plugin name="Camera" value="org.apache.cordova.CameraLauncher"/>-->
-    <plugin name="Camera" value="com.foregroundcameraplugin.ForegroundCameraLauncher"/>
+    <plugin name="Camera" value="org.apache.cordova.CameraLauncher"/>
     <plugin name="Contacts" value="org.apache.cordova.ContactManager"/>
     <plugin name="File" value="org.apache.cordova.FileUtils"/>
     <plugin name="NetworkStatus" value="org.apache.cordova.NetworkManager"/>
     <plugin name="Notification" value="org.apache.cordova.Notification"/>
     <plugin name="Storage" value="org.apache.cordova.Storage"/>
-    <plugin name="Temperature" value="org.apache.cordova.TempListener"/>
     <plugin name="FileTransfer" value="org.apache.cordova.FileTransfer"/>
     <plugin name="Capture" value="org.apache.cordova.Capture"/>
     <plugin name="Battery" value="org.apache.cordova.BatteryListener"/>
     <plugin name="SplashScreen" value="org.apache.cordova.SplashScreen"/>
     <plugin name="Echo" value="org.apache.cordova.Echo" />
+    <plugin name="Globalization" value="org.apache.cordova.Globalization"/>
+    <plugin name="InAppBrowser" value="org.apache.cordova.InAppBrowser"/>
+    
+    <plugin name="Camera" value="com.foregroundcameraplugin.ForegroundCameraLauncher" />
     <plugin name="WebIntent" value="com.borismus.webintent.WebIntent"/>
     <plugin name="ActionBar" value="co.mwater.clientapp.ActionBarPlugin"/>
     <plugin name="BluetoothPlugin" value="org.apache.cordova.plugin.BluetoothPlugin"/>

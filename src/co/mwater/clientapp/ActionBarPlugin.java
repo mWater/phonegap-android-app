@@ -1,10 +1,9 @@
 package co.mwater.clientapp;
 
 import java.io.File;
-import java.io.IOException;
 
-import org.apache.cordova.api.Plugin;
-import org.apache.cordova.api.PluginResult;
+import org.apache.cordova.api.CallbackContext;
+import org.apache.cordova.api.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,9 +19,9 @@ import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 /**
  * ActionBarPlugin is a PhoneGap plugin that allows hooking into the action bar:
  */
-public class ActionBarPlugin extends Plugin {
+public class ActionBarPlugin extends CordovaPlugin {
 	private static String TAG = ActionBarPlugin.class.getSimpleName();
-	private String menuCallback = null;
+	private CallbackContext menuCallbackContext;
 	JSONArray menuArgs;
 	
 	// Set this to the path under which icons will be found. No termination slash
@@ -39,22 +38,19 @@ public class ActionBarPlugin extends Plugin {
 	 *            The callback id used when calling back into JavaScript.
 	 * @return A PluginResult object with a status and message.
 	 */
-	public PluginResult execute(String action, final JSONArray args, String callbackId) {
+	public boolean execute(String action, final JSONArray args, CallbackContext callbackContext) {
 		if (action.equals("menu")) {
 			// Parse menu items (array of dicts of id, text*, icon*, ifRoom*,
 			// enabled*)
 			menuArgs = args;
-			menuCallback = callbackId;
+			menuCallbackContext = callbackContext;
 
-			this.cordova.getActivity().runOnUiThread(new Runnable() {
+			cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					((ActionBarPluginActivity) ActionBarPlugin.this.cordova.getActivity()).reloadMenu(ActionBarPlugin.this);
 				}
 			});
-
-			PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
-			result.setKeepCallback(true);
-			return result;
+			return true;
 		}
 		if (action.equals("title")) {
 			// Set title of actionbar
@@ -67,11 +63,9 @@ public class ActionBarPlugin extends Plugin {
 					}
 				});
 			} catch (JSONException e) {
-				return new PluginResult(PluginResult.Status.INVALID_ACTION);
+				return false;
 			}
-
-			PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
-			return result;
+			return true;
 		}
 		if (action.equals("up")) {
 			// Set state of up display on home button
@@ -83,19 +77,16 @@ public class ActionBarPlugin extends Plugin {
 					}
 				});
 			} catch (JSONException e) {
-				return new PluginResult(PluginResult.Status.INVALID_ACTION);
+				return false;
 			}
-			PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
-			return result;
+			return true;
 		}
-		return new PluginResult(PluginResult.Status.INVALID_ACTION);
+		return false;
 	}
 
 	void handleMenuItemClick(String id) {
 		Log.d(TAG, "Menu click " + id);
-		PluginResult result = new PluginResult(PluginResult.Status.OK, id);
-		result.setKeepCallback(true);
-		this.success(result, this.menuCallback);
+		menuCallbackContext.success(id);
 	}
 
 	SherlockActivity getSherlockActivity() {
