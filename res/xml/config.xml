@@ -57,6 +57,7 @@
     <plugin name="WebIntent" value="com.borismus.webintent.WebIntent"/>
     <plugin name="ActionBar" value="co.mwater.clientapp.ActionBarPlugin"/>
     <plugin name="BluetoothPlugin" value="org.apache.cordova.plugin.BluetoothPlugin"/>
+    <plugin name="OpenCVActivity" value="co.mwater.opencvactivity.OpenCVActivityPlugin"/>
 </plugins>
 </cordova>
 

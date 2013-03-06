@@ -34,6 +34,8 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 	private static String TAG = MainActivity.class.getSimpleName();
 	private final ExecutorService threadPool = Executors.newCachedThreadPool();
 	String initialHash;
+	
+	boolean debugMode = true;
 
 	@Override
 	protected void onPause() {
@@ -138,13 +140,26 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 			Log.d(TAG, "Launching url " + url);
 			cwv.loadUrl(url);
 			
-			// Launch thread to download updates
-			AppUpdater.downloadUpdates(getApplicationContext());
+			if (!debugMode) {
+				// Launch thread to download updates
+				AppUpdater.downloadUpdates(getApplicationContext());
+			}
 		}
 
 		@Override
 		protected String doInBackground(Context[] contexts) {
 			Context ctx = contexts[0];
+			
+			// Special case for debugging
+			if (debugMode) {
+				// Setup actionbar plugin
+				ActionBarPlugin.baseIconPath = "file:///android_asset/app";
+
+				String overrideUrl = "file:///android_asset/app/index.html?cordova=true";
+				if (initialHash != null)
+					return overrideUrl + "#" + initialHash;
+				return overrideUrl;
+			}
 
 			// Launch thread to start app
 			try {

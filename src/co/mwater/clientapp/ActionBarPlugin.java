@@ -1,6 +1,7 @@
 package co.mwater.clientapp;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.cordova.api.CallbackContext;
 import org.apache.cordova.api.CordovaPlugin;
@@ -109,7 +110,13 @@ public class ActionBarPlugin extends CordovaPlugin {
 					}
 				});
 				if (item.has("icon")) {
-					Drawable d = Drawable.createFromPath(baseIconPath + File.separator  + item.getString("icon"));
+					String iconPath = item.getString("icon");
+					Drawable d;
+					if (baseIconPath.startsWith("file:///android_asset/")) {
+						d = Drawable.createFromStream(cordova.getActivity().getAssets().open(baseIconPath.substring(22) + File.separator  + iconPath), null);
+					}
+					else
+						d = Drawable.createFromPath(baseIconPath + File.separator  + iconPath);
 					menuItem.setIcon(d);
 				}
 				if (item.has("enabled")) {
@@ -122,6 +129,9 @@ public class ActionBarPlugin extends CordovaPlugin {
 		} catch (JSONException e) {
 			e.printStackTrace();
 			throw new IllegalArgumentException("Invalid menu", e);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new IllegalArgumentException("Invalid menu icon", e);
 		} 
 	}
 
