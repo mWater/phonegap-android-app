@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 
+<!--
 		Copyright 2012 Bruno Carreira - Lucas Farias - Rafael Luna - Vinícius Fonseca. 
 
 		Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,18 +13,18 @@
 		WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 		See the License for the specific language governing permissions and
    		limitations under the License. 
- -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/FrameLayout1"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:baselineAligned="true"
-    android:orientation="horizontal" >
+    android:layout_height="fill_parent" >
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/camera_preview"
-        android:layout_width="0dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="0.85" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout1"
@@ -45,4 +45,4 @@
             android:text="@string/lblCancelar" />
     </LinearLayout>
 
-</LinearLayout>
+</FrameLayout>

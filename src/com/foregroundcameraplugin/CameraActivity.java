@@ -1,5 +1,5 @@
 /*
-	    Copyright 2012 Bruno Carreira - Lucas Farias - Rafael Luna - Vinícius Fonseca.
+	    Copyright 2012 Bruno Carreira - Lucas Farias - Rafael Luna - Vinï¿½cius Fonseca.
 
 		Licensed under the Apache License, Version 2.0 (the "License");
 		you may not use this file except in compliance with the License.
@@ -32,8 +32,11 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 /**
  * Camera Activity Class. Configures Android camera to take picture and show it.
@@ -43,7 +46,7 @@ public class CameraActivity extends Activity {
 	private static final String TAG = "CameraActivity";
 
 	private Camera mCamera;
-	private ForegroundCameraPreview mPreview;
+	private CameraPreview mPreview;
 	private boolean pressed = false;
 
 	@Override
@@ -55,9 +58,12 @@ public class CameraActivity extends Activity {
 		mCamera = getCameraInstance();
 
 		// Create a Preview and set it as the content of activity.
-		mPreview = new ForegroundCameraPreview(this, mCamera);
-		FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-		preview.addView(mPreview);
+		mPreview = new CameraPreview(this);
+		mPreview.setCamera(mCamera);
+		
+		
+		LinearLayout preview = (LinearLayout)findViewById(R.id.camera_preview);
+		preview.addView(mPreview, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
 		// Add a listener to the Capture button
 		Button captureButton = (Button) findViewById(R.id.button_capture);

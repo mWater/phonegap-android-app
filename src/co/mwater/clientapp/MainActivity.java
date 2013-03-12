@@ -18,6 +18,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
@@ -34,8 +35,8 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 	private static String TAG = MainActivity.class.getSimpleName();
 	private final ExecutorService threadPool = Executors.newCachedThreadPool();
 	String initialHash;
-	
-	boolean debugMode = true;
+
+	boolean debugMode;
 
 	@Override
 	protected void onPause() {
@@ -105,6 +106,8 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 		cwv = (CordovaWebView) findViewById(R.id.mainView);
 		SpecialChromeClient client = new SpecialChromeClient(this, cwv);
 		cwv.setWebChromeClient(client);
+
+		debugMode = ( 0 != ( getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE ) );
 
 		// TODO Clear cache
 		// cwv.clearCache(true);
