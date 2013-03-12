@@ -7,6 +7,7 @@ import java.net.URLDecoder;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.cordova.Config;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.api.CordovaInterface;
 import org.apache.cordova.api.CordovaPlugin;
@@ -96,6 +97,8 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        Config.init(this);
+
 		Log.d(TAG, "onCreate");
 
 		if (savedInstanceState != null) {

@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.apache.cordova.api.CallbackContext;
 import org.apache.cordova.api.CordovaPlugin;
+import org.apache.cordova.api.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -87,7 +88,9 @@ public class ActionBarPlugin extends CordovaPlugin {
 
 	void handleMenuItemClick(String id) {
 		Log.d(TAG, "Menu click " + id);
-		menuCallbackContext.success(id);
+		PluginResult result = new PluginResult(PluginResult.Status.OK, id);
+		result.setKeepCallback(true);
+		menuCallbackContext.sendPluginResult(result);
 	}
 
 	SherlockActivity getSherlockActivity() {
