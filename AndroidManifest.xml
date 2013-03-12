@@ -43,6 +43,7 @@
        	<activity
 			android:name="com.foregroundcameraplugin.CameraActivity"
 			android:label="ForegroundCameraPlugin"
+			android:theme="@style/Theme.Sherlock.NoActionBar"
 			android:screenOrientation="landscape" >
 		</activity>
 		<activity
