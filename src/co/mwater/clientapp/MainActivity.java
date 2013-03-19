@@ -110,7 +110,12 @@ public class MainActivity extends SherlockActivity implements CordovaInterface, 
 		SpecialChromeClient client = new SpecialChromeClient(this, cwv);
 		cwv.setWebChromeClient(client);
 
-		debugMode = ( 0 != ( getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE ) );
+		// Debug mode if app folder present
+		try {
+			debugMode = getAssets().list("app").length > 0;
+		} catch (IOException e) {
+			debugMode = false;
+		}
 
 		// TODO Clear cache
 		// cwv.clearCache(true);

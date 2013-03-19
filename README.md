@@ -1,3 +1,4 @@
+Copyright 2012 mWater
 
 Requires Actionbar Sherlock <=4.1.0 as Eclipse project. 4.2.0 removes forced overflow.
 
